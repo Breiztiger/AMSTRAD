@@ -229,7 +229,6 @@ always @(posedge CLOCK) begin
 			else hsc <= 0;
 			end
 		end
-		else HSYNC <= 0
 	end
 end
 
