@@ -7,7 +7,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use IEEE.STD_LOGIC_ARITH.ALL;
+--use IEEE.STD_LOGIC_ARITH.ALL;
+--use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 entity tzxplayer is
 generic (
