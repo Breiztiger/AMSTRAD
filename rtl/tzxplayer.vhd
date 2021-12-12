@@ -432,7 +432,13 @@ begin
 
 			when TZX_PLAY_TONE =>
 				tzx_req <= tzx_ack; -- don't request new byte
-				end_period <= not wave_period;
+				if wave_inverted = '0' then
+					wave_period <= not wave_period;
+					end_period <= not wave_period; -- request pulse
+				else
+					end_period <= wave_period;
+					wave_inverted <= '0';
+				end if;
 				pulse_len <= pilot_l;
 				if pilot_pulses /= 0 then
 					pilot_pulses <= pilot_pulses - 1;
