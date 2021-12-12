@@ -192,8 +192,8 @@ assign VGA_SCALER= 0;
 `include "build_id.v"
 localparam CONF_STR = {
 	"Amstrad;;",
-	"S0,DSK,Mount A:;",
-	"S1,DSK,Mount B:;",
+	"S0U,DSK,Mount Disk A:;",
+	"S1U,DSK,Mount Disk B:;",
 	"-;",
 	"F3,E??,Load expansion;",
 	"-;",
@@ -466,7 +466,6 @@ end
 
 ////////////////////// CDT playback ///////////////////////////////
 
-reg  [22:0] tape_last_addr;
 reg   [7:0] tape_din;
 reg         tape_wr = 0;
 wire        tape_wr_ack;
@@ -474,8 +473,13 @@ wire        tape_read;
 wire        tape_data_req;
 wire        tape_data_ack;
 reg         tape_reset;
+reg         tape_rd;
+reg         tape_play;
+wire        tape_motor;
+reg         tape_end;
 wire  [7:0] tape_dout;
 reg  [22:0] tape_play_addr;
+reg  [22:0] tape_last_addr;
 wire        tape_motor;
 
 always @(posedge clk_sys) begin
