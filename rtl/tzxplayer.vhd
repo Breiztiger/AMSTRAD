@@ -18,7 +18,8 @@ generic (
 	NORMAL_SYNC2_LEN    : integer := 735;
 	NORMAL_ZERO_LEN     : integer := 855;
 	NORMAL_ONE_LEN      : integer := 1710;
-	NORMAL_PILOT_PULSES : integer := 3223 -- this is the non-header length
+	HEADER_PILOT_PULSES : integer := 8063; -- this is the header length
+	NORMAL_PILOT_PULSES : integer := 3223  -- this is the non-header length
 
 	-- Amstrad CPC
 	--NORMAL_PILOT_LEN    : integer := 2000;
@@ -26,6 +27,7 @@ generic (
 	--NORMAL_SYNC2_LEN    : integer := 855;
 	--NORMAL_ZERO_LEN     : integer := 855;
 	--NORMAL_ONE_LEN      : integer := 1710;
+	--HEADER_PILOT_PULSES : integer := 4095; -- no difference between header and data pilot lengths
 	--NORMAL_PILOT_PULSES : integer := 4095
 );
 port(
@@ -410,12 +412,19 @@ begin
 					tzx_req <= tzx_ack; -- don't request new byte
 					data_len(15 downto  8) <= tap_fifo_do;
 					data_len(23 downto 16) <= (others => '0');
+				elsif tzx_offset = x"04" then
+					-- this is the first data byte to determine if it's a header or data block (on Speccy)
+					tzx_req <= tzx_ack; -- don't request new byte								
 					pilot_l <= to_unsigned(NORMAL_PILOT_LEN, pilot_l'length);
 					sync1_l <= to_unsigned(NORMAL_SYNC1_LEN, sync1_l'length);
 					sync2_l <= to_unsigned(NORMAL_SYNC2_LEN, sync2_l'length);
 					zero_l  <= to_unsigned(NORMAL_ZERO_LEN,  zero_l'length);
 					one_l   <= to_unsigned(NORMAL_ONE_LEN,   one_l'length);
-					pilot_pulses <= to_unsigned(NORMAL_PILOT_PULSES, pilot_pulses'length);
+					if tap_fifo_do = 0 then
+						pilot_pulses <= to_unsigned(HEADER_PILOT_PULSES, pilot_pulses'length);
+					else
+						pilot_pulses <= to_unsigned(NORMAL_PILOT_PULSES, pilot_pulses'length);
+					end if;
 					last_byte_bits <= "1000";
 					tzx_state <= TZX_PLAY_TONE;
 				end if;
@@ -476,6 +485,7 @@ begin
 				tzx_state <= TZX_PLAY_TAPBLOCK;
 
 			when TZX_PLAY_TAPBLOCK =>
+				tzx_req <= tzx_ack; -- don't request new byte
 				bit_cnt <= "111";
 				tzx_state <= TZX_PLAY_TAPBLOCK2;
 
