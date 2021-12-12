@@ -578,7 +578,7 @@ always @(posedge clk_sys) begin : fdc
 			7:
 			if (!tinfo_wait) begin
 				i_current_track_sectors[i_current_drive][tinfo_hds] <= tinfo_data;
-				i_rpm_time[i_current_drive][tinfo_hds] <= tinfo_data ? TRACK_TIME/tinfo_data : CYCLES;
+				i_rpm_timer[i_current_drive][tinfo_hds] <= tinfo_data ? TRACK_TIME/tinfo_data : CYCLES;
 
 				//assume the head position is at the start of a track after a seek
 				if (i_current_sector_pos[i_current_drive][tinfo_hds] >= tinfo_data) begin
