@@ -645,7 +645,7 @@ always @(posedge clk_sys) begin : fdc
 			3:
 			if (~tinfo_wait) begin
 				if (tinfo_addr[7:0] == 8'h14) begin
-					if (!image_edsk[sector_search_ds0]) sector_length[sector_search_hds][sector_search_ds0] <= 8'h80 << tinfo_data[2:0];
+				if (!image_edsk[sector_search_ds0]) sector_length[sector_search_ds0][sector_search_hds] <= 16'h80 << tinfo_data[2:0];
 					tinfo_addr[7:0] <= 8'h18; //sector info list
 					tinfo_wait <= 1;
 				end else if (i_current_sector == 8'h1D && ~tinfo_addr[0]) begin
@@ -1027,7 +1027,7 @@ always @(posedge clk_sys) begin : fdc
 
 			//process trackInfo + sectorInfo
 			COMMAND_RW_DATA_EXEC3:
-			if (i_secinfo_valid[ds0][hds]) begin
+			if (i_secinfo_valid[ds0][hds] && i_byte_clk_en) begin
 				i_sector <= i_current_sector_pos[ds0][hds];
 
 				if (i_sector != i_current_sector_pos[ds0][hds]) begin
@@ -1043,8 +1043,8 @@ always @(posedge clk_sys) begin : fdc
 				end
 
 				if ((i_current_sector_pos[ds0][hds] == i_current_track_sectors[ds0][hds] - 1) &&
-				    (sector_byte_pos[ds0][hds] == sector_length[ds0][hds]-1) &&
-					  (ds0 == i_current_drive) && i_byte_clk_en) begin
+				    (sector_byte_pos[ds0][hds] == (sector_end_pos[ds0][hds] + gap3[ds0][hds] - 1)) &&
+					(ds0 == i_current_drive)) begin
 					$display("passed index mark, pass: %d", i_scanning);
 					// passed index mark
 					if (i_scanning) begin
